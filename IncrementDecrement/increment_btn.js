@@ -1,48 +1,56 @@
-
-//prevState is better choise, because setState is asynchronous method
+// Write JavaScript here and press Ctrl+Enter to execute
 class Button extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = {counter : 0}
-  }
   
-  handleClick = () => {
-    this.setState((prevState) => {
-      return {
-        counter: prevState.counter + 1
-      };
-    });
-  }
+  // handleClick = () => {
+  //  this.setState((prevState) => {
+  //    return {
+  //      counter: prevState.counter + 1
+  //     };
+  //   });
+  // }
   
   render () {
     return (
-      <button onClick={this.handleClick}>{this.state.counter}</button>
+      <button onClick={this.props.onClickFunction}>{this.props.label}</button>
     );
   }
 }
 
-ReactDOM.render(<Button />, mountNode);
+const Result = (props) => {
+  return (
+    <div>{props.counter}</div>
+  );
+} 
 
-
-/// not the best choise change current state (because setState is asynchronous method)
-/*class Button extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = {counter : 0}
-  }
+class App extends React.Component {
+  // constructor (props) {
+  // super(props);
+  // this.state = {counter : 0}
+  // }
   
-  handleClick = () => {
-    this.setState({
-      counter: this.state.counter + 1
-    });
+  state = {counter : 0};
+  
+  incrementValue = () => {
+    this.setState((prevState) => ({
+      counter: prevState.counter + 1
+    }));
+  };
+  
+  decrementValue = () => {
+    this.setState((prevState) => ({
+      counter : prevState.counter - 1
+    }));
   }
   
   render () {
     return (
-      <button onClick={this.handleClick}>{this.state.counter}</button>
+      <div>
+        <Button onClickFunction={this.decrementValue} label="-" />
+        <Result counter={this.state.counter}/>
+        <Button onClickFunction={this.incrementValue} label="+"/>
+      </div>  
     );
   }
 }
 
-ReactDOM.render(<Button />, mountNode);
-**/
+ReactDOM.render(<App />, mountNode);
