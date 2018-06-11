@@ -11,14 +11,16 @@ class Button extends React.Component {
   
   render () {
     return (
-      <button onClick={this.props.onClickFunction}>{this.props.label}</button>
+      <button onClick={() => this.props.onClickFunction(this.props.value)}>{this.props.label}{this.props.value}</button>
     );
   }
 }
 
 const Result = (props) => {
   return (
-    <div>{props.counter}</div>
+    <div>
+      {props.counter}
+    </div>
   );
 } 
 
@@ -30,24 +32,38 @@ class App extends React.Component {
   
   state = {counter : 0};
   
-  incrementValue = () => {
+  incrementCounter = (value) => {
     this.setState((prevState) => ({
-      counter: prevState.counter + 1
+      counter: prevState.counter + value
     }));
   };
   
-  decrementValue = () => {
+  decrementCounter = (value) => {
     this.setState((prevState) => ({
-      counter : prevState.counter - 1
+      counter : prevState.counter - value
+    }));
+  }
+  
+  resetCounter = () => {
+    this.setState((prevState) => ({
+      counter : 0
     }));
   }
   
   render () {
     return (
       <div>
-        <Button onClickFunction={this.decrementValue} label="-" />
+        <Button label="-" value={1} onClickFunction={this.decrementCounter} />
+        <Button label="-" value={5} onClickFunction={this.decrementCounter} />
+        <Button label="-" value={10} onClickFunction={this.decrementCounter} />
+        <Button label="-" value={50} onClickFunction={this.decrementCounter} />
         <Result counter={this.state.counter}/>
-        <Button onClickFunction={this.incrementValue} label="+"/>
+        <Button label="+" value={1} onClickFunction={this.incrementCounter} />
+        <Button label="+" value={5} onClickFunction={this.incrementCounter} />
+        <Button label="+" value={10} onClickFunction={this.incrementCounter} />
+        <Button label="+" value={50} onClickFunction={this.incrementCounter} />
+        <p></p>
+        <Button label="Reset" onClickFunction={this.resetCounter} />
       </div>  
     );
   }
