@@ -15,7 +15,7 @@ const Card = (props) => {
 const CardList = (props) => {
   return (
     <div>
-      {props.cards.map(card => <Card {...card} />)}
+      {props.cards.map(card => <Card key={card.id} {...card} />)}
     </div>
   );
 }
@@ -29,6 +29,7 @@ class Form extends React.Component {
     axios.get(`https://api.github.com/users/${this.state.username}`)
       .then(resp => {
         this.props.onSubmit(resp.data);
+        this.setState({username : ""});
       });
   }
   render () {
