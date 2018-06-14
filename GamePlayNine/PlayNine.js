@@ -1,3 +1,22 @@
+// bit.ly/s-pcs
+var possibleCombinationSum = function(arr, n) {
+  if (arr.indexOf(n) >= 0) { return true; }
+  if (arr[0] > n) { return false; }
+  if (arr[arr.length - 1] > n) {
+    arr.pop();
+    return possibleCombinationSum(arr, n);
+  }
+  var listSize = arr.length, combinationsCount = (1 << listSize)
+  for (var i = 1; i < combinationsCount ; i++ ) {
+    var combinationSum = 0;
+    for (var j=0 ; j < listSize ; j++) {
+      if (i & (1 << j)) { combinationSum += arr[j]; }
+    }
+    if (n === combinationSum) { return true; }
+  }
+  return false;
+};
+
 //Used Bootstrap, Fontawesome and some CSS
 const Stars = (props) => {
   // const numberOfStars = 1 + Math.floor(Math.random()*9);
@@ -60,32 +79,53 @@ const Answer = (props) => {
 }
 
 const Numbers = (props) => {
+
   // const arrayOfNumbers = _.range(1,10);
   const numberClassName = (number) => {
-    if (props.usedNumbers.indexOf(number) >= 0)
+    if (props.usedNumbers.indexOf(number) >= 0) {
       return 'used';
-    if (props.selectedNumbers.indexOf(number) >= 0)
+    }
+    if (props.selectedNumbers.indexOf(number) >= 0) {
       return 'selected';
+    }
   }
   return (
     <div className="card text-center">
       <div>
         {Number.list.map((number, i) => 
         <span key={i} className={numberClassName(number)} 
-              onClick={() => (props.selectNumber(number))}>{number}</span>)}
+              onClick={() => (props.selectNumber(number))}>
+          {number}
+        </span>)}
       </div>
+    </div>
+  );
+}
+
+const DoneFrame = (props) => {
+  return (
+    <div className="text-center">
+      <h2>{props.doneStatus}</h2>
+      <button className="btn btn-secondary" onClick={props.resetGame} >
+        Play Again
+      </button>
     </div>
   );
 }
 
 class Game extends React.Component {
   static randomNumber = () => 1 + Math.floor(Math.random()*9);
-  state = {
+  static initialState = () => ({
     selectedNumbers: [],
     randomNumberOfStars: Game.randomNumber(),
     isAnswerCorrect: null,
     usedNumbers: [],
     numberOfRedraws: 5,
+    doneStatus: null,
+  });
+  state = Game.initialState();
+  resetGame = () => {
+    this.setState(Game.initialState());
   };
   
   selectNumber = (clickedNumber) => {
@@ -112,7 +152,7 @@ class Game extends React.Component {
       selectedNumbers: [],
       isAnswerCorrect: null,
       randomNumberOfStars: Game.randomNumber(),
-    }));
+    }), this.updateDoneStatus);
   };
   redraw = () => {
     if (this.state.numberOfRedraws === 0) { return; }
@@ -121,7 +161,25 @@ class Game extends React.Component {
       isAnswerCorrect: null,
       selectedNumbers: [],
       numberOfRedraws: prevState.numberOfRedraws - 1
-    }));
+    }), this.updateDoneStatus);
+  }
+  
+  possibleSolutions = ({randomNumberOfStars, usedNumbers}) => {
+    const possibleNumbers = _.range(1,10).filter(number =>
+      usedNumbers.indexOf(number) === -1
+    );
+    
+    return possibleCombinationSum(possibleNumbers, randomNumberOfStars);
+  }
+  updateDoneStatus = () => {
+    this.setState(prevState => {
+      if (prevState.usedNumbers.length === 9) {
+        return {doneStatus: 'Allohe, KRASAVCHIK!'};
+      }
+      if (prevState.numberOfRedraws === 0 && !this.possibleSolutions(prevState)) {
+        return { doneStatus: 'Game Over! Looser...'};
+      }
+    });
   }
 
   render () {
@@ -129,7 +187,8 @@ class Game extends React.Component {
             selectedNumbers, 
             isAnswerCorrect,
             usedNumbers,
-            numberOfRedraws} = this.state;
+            numberOfRedraws,
+            doneStatus, } = this.state;
     return (
       <div className="container">
         <h3>Play Game</h3>
@@ -145,9 +204,12 @@ class Game extends React.Component {
                   unselectNumber={this.unselectNumber} />
         </div>
         <br />
-        <Numbers selectedNumbers={selectedNumbers} 
+        {doneStatus ? 
+            <DoneFrame resetGame={this.resetGame} doneStatus={doneStatus} /> :
+            <Numbers selectedNumbers={selectedNumbers} 
                  selectNumber={this.selectNumber}
                  usedNumbers={usedNumbers} />
+        }
       </div>
     );
   }
